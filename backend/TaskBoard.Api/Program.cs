@@ -2,6 +2,7 @@ using TaskBoard.Api.Models;
 using TaskBoard.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
@@ -70,6 +71,21 @@ app.MapGet("api/tasks/{id}", async(int id, TaskBoardDbContext db) =>
 
 app.MapPost("/api/tasks", async(TaskItem task, TaskBoardDbContext db) =>
 {
+    var validationResults = new List<ValidationResult>();
+    var context = new ValidationContext(task);
+
+    if (!Validator.TryValidateObject(task,context,validationResults,validateAllProperties: true))
+    {
+        var error = validationResults
+            .GroupBy(r => r.MemberNames.FirstOrDefault() ?? string.Empty)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(r => r.ErrorMessage ?? string.Empty).ToArray());
+
+        return Results.ValidationProblem(error);
+    }
+
+
     task.CreatedAt = DateTime.UtcNow;
     db.Tasks.Add(task);
 
@@ -80,6 +96,18 @@ app.MapPost("/api/tasks", async(TaskItem task, TaskBoardDbContext db) =>
 
 app.MapPut("/api/tasks/{id}", async(int id, TaskItem updatedTask,TaskBoardDbContext db) =>
 {
+    var validationResults = new List<ValidationResult>();
+    var context = new ValidationContext(updatedTask);
+    if (!Validator.TryValidateObject(updatedTask, context, validationResults, validateAllProperties: true))
+    {
+        var errors = validationResults
+            .GroupBy(r => r.MemberNames.FirstOrDefault() ?? string.Empty)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(r => r.ErrorMessage ?? string.Empty).ToArray());
+        return Results.ValidationProblem(errors);
+    }
+
     var task = await db.Tasks.FindAsync(id);
 
     if (task is null)
