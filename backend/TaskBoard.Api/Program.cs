@@ -2,7 +2,8 @@ using TaskBoard.Api.Models;
 using TaskBoard.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
-using System.ComponentModel.DataAnnotations;
+using TaskBoard.Api.Dtos;
+using TaskBoard.Api.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
@@ -69,24 +70,20 @@ app.MapGet("api/tasks/{id}", async(int id, TaskBoardDbContext db) =>
     return Results.Ok(task);
 });
 
-app.MapPost("/api/tasks", async(TaskItem task, TaskBoardDbContext db) =>
+app.MapPost("/api/tasks", async(CreateTaskDto dto, TaskBoardDbContext db) =>
 {
-    var validationResults = new List<ValidationResult>();
-    var context = new ValidationContext(task);
+    if (ValidationHelper.Validate(dto) is { } problem)
+        return problem;
 
-    if (!Validator.TryValidateObject(task,context,validationResults,validateAllProperties: true))
+
+    var task = new TaskItem
     {
-        var error = validationResults
-            .GroupBy(r => r.MemberNames.FirstOrDefault() ?? string.Empty)
-            .ToDictionary(
-                g => g.Key,
-                g => g.Select(r => r.ErrorMessage ?? string.Empty).ToArray());
+        Title = dto.Title,
+        Description = dto.Description,
+        Status = dto.Status,
+        CreatedAt = DateTime.UtcNow
+    };
 
-        return Results.ValidationProblem(error);
-    }
-
-
-    task.CreatedAt = DateTime.UtcNow;
     db.Tasks.Add(task);
 
     await db.SaveChangesAsync();
@@ -94,28 +91,19 @@ app.MapPost("/api/tasks", async(TaskItem task, TaskBoardDbContext db) =>
     return Results.Created($"/api/tasks/{task.Id}", task);
 });
 
-app.MapPut("/api/tasks/{id}", async(int id, TaskItem updatedTask,TaskBoardDbContext db) =>
+app.MapPut("/api/tasks/{id}", async(int id, UpdateTaskDto dto,TaskBoardDbContext db) =>
 {
-    var validationResults = new List<ValidationResult>();
-    var context = new ValidationContext(updatedTask);
-    if (!Validator.TryValidateObject(updatedTask, context, validationResults, validateAllProperties: true))
-    {
-        var errors = validationResults
-            .GroupBy(r => r.MemberNames.FirstOrDefault() ?? string.Empty)
-            .ToDictionary(
-                g => g.Key,
-                g => g.Select(r => r.ErrorMessage ?? string.Empty).ToArray());
-        return Results.ValidationProblem(errors);
-    }
+    if (ValidationHelper.Validate(dto) is { } problem)
+        return problem;
 
     var task = await db.Tasks.FindAsync(id);
 
     if (task is null)
         return Results.NotFound();
 
-    task.Title =  updatedTask.Title;
-    task.Description = updatedTask.Description;
-    task.Status = updatedTask.Status;
+    task.Title =  dto.Title;
+    task.Description = dto.Description;
+    task.Status = dto.Status;
 
     await db.SaveChangesAsync();
 
