@@ -1,9 +1,15 @@
 using TaskBoard.Api.Models;
+using TaskBoard.Api.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext<TaskBoardDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -11,8 +17,6 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-var tasks = new List<TaskItem>();
-var nextId = 1;
 
 if (app.Environment.IsDevelopment())
 {
@@ -49,32 +53,34 @@ app.MapGet("/weatherforecast", () =>
 
 
 
-app.MapGet("api/tasks", () =>
+app.MapGet("api/tasks", async(TaskBoardDbContext db) =>
 {
+    var tasks = await db.Tasks.ToListAsync();
     return Results.Ok(tasks);
 });
 
-app.MapGet("api/tasks/{id}", (int id) =>
+app.MapGet("api/tasks/{id}", async(int id, TaskBoardDbContext db) =>
 {
-    var task = tasks.FirstOrDefault(t => t.Id == id);
+    var task = await db.Tasks.FindAsync(id);
 
     if (task is null)
         return Results.NotFound();
     return Results.Ok(task);
 });
 
-app.MapPost("/api/tasks", (TaskItem task) =>
+app.MapPost("/api/tasks", async(TaskItem task, TaskBoardDbContext db) =>
 {
-    task.Id = nextId++;
     task.CreatedAt = DateTime.UtcNow;
-    tasks.Add(task);
+    db.Tasks.Add(task);
+
+    await db.SaveChangesAsync();
 
     return Results.Created($"/api/tasks/{task.Id}", task);
 });
 
-app.MapPut("/api/tasks/{id}", (int id, TaskItem updatedTask) =>
+app.MapPut("/api/tasks/{id}", async(int id, TaskItem updatedTask,TaskBoardDbContext db) =>
 {
-    var task = tasks.FirstOrDefault(t => t.Id == id);
+    var task = await db.Tasks.FindAsync(id);
 
     if (task is null)
         return Results.NotFound();
@@ -83,17 +89,20 @@ app.MapPut("/api/tasks/{id}", (int id, TaskItem updatedTask) =>
     task.Description = updatedTask.Description;
     task.Status = updatedTask.Status;
 
+    await db.SaveChangesAsync();
+
     return Results.Ok(task);
 });
 
-app.MapDelete("/api/tasks/{id}", (int id) =>
+app.MapDelete("/api/tasks/{id}", async(int id, TaskBoardDbContext db) =>
 {
-    var task = tasks.FirstOrDefault(t => t.Id == id);
+    var task = await db.Tasks.FindAsync(id);
 
     if (task is null)
         return Results.NotFound();
 
-    tasks.Remove(task);
+    db.Tasks.Remove(task);
+    await db.SaveChangesAsync();
 
     return Results.NoContent();
 });
