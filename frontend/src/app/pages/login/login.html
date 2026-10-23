@@ -1,0 +1,24 @@
+<section class="login">
+  <h1>TaskBoard</h1>
+  <p>Prijavi se na nalog</p>
+
+  <form (ngSubmit)="onSubmit()">
+    <label>
+      Email
+      <input type="email" name="email" [(ngModel)]="email" required />
+    </label>
+
+    <label>
+      Lozinka
+      <input type="password" name="password" [(ngModel)]="password" required />
+    </label>
+
+    @if (errorMessage()) {
+      <p class="error">{{ errorMessage() }}</p>
+    }
+
+    <button type="submit" [disabled]="isLoading()">
+      {{ isLoading() ? 'Prijava…' : 'Prijavi se' }}
+    </button>
+  </form>
+</section>
