@@ -21,4 +21,14 @@ export class TaskService {
   getTasks(): Observable<TaskItem[]> {
     return this.http.get<TaskItem[]>(`${environment.apiUrl}/api/tasks`);
   }
+
+  createTask(payload: CreateTaskRequest): Observable<TaskItem> {
+    return this.http.post<TaskItem>(`${environment.apiUrl}/api/tasks`, payload);
+  }
+}
+
+export interface CreateTaskRequest {
+  title: string;
+  description: string;
+  status: string;
 }
