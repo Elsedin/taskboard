@@ -25,9 +25,24 @@ export class TaskService {
   createTask(payload: CreateTaskRequest): Observable<TaskItem> {
     return this.http.post<TaskItem>(`${environment.apiUrl}/api/tasks`, payload);
   }
+
+  updateTask(id: number, payload: UpdateTaskRequest): Observable<TaskItem> {
+    return this.http.put<TaskItem>(`${environment.apiUrl}/api/tasks/${id}`, payload);
+  }
+
+  deleteTask(id: number): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/api/tasks/${id}`);
+  }
 }
 
+
 export interface CreateTaskRequest {
+  title: string;
+  description: string;
+  status: string;
+}
+
+export interface UpdateTaskRequest {
   title: string;
   description: string;
   status: string;

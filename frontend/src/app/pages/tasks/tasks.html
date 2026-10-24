@@ -12,8 +12,8 @@
     <p class="error">{{ errorMessage() }}</p>
   }
 
-  <form class="create-form" (ngSubmit)="onCreate()">
-    <h2>New task</h2>
+    <form class="create-form" (ngSubmit)="onSubmit()">
+        <h2>{{ editingId === null ? 'New task' : 'Edit task' }}</h2>
 
     <label>
       Title
@@ -34,7 +34,15 @@
       </select>
     </label>
 
-    <button type="submit">Add</button>
+        <div class="form-actions">
+      <button type="submit">
+        {{ editingId === null ? 'Add' : 'Save' }}
+      </button>
+
+      @if (editingId !== null) {
+        <button type="button" (click)="cancelEdit()">Cancel</button>
+      }
+    </div>
   </form>
 
   @if (tasks().length === 0 && !isLoading()) {
@@ -50,6 +58,10 @@
           <p>{{ task.description }}</p>
         }
         <small>{{ task.createdAt | date: 'short' }}</small>
+                <div class="row-actions">
+          <button type="button" (click)="startEdit(task)">Edit</button>
+          <button type="button" (click)="onDelete(task)">Delete</button>
+        </div>
       </li>
     }
   </ul>

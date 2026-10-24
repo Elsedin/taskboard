@@ -3,7 +3,12 @@ import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { CreateTaskRequest, TaskItem, TaskService } from '../../services/task.service';
+import {
+  CreateTaskRequest,
+  TaskItem,
+  TaskService,
+  UpdateTaskRequest,
+} from '../../services/task.service';
 
 @Component({
   selector: 'app-tasks',
@@ -19,7 +24,7 @@ export class Tasks implements OnInit {
   tasks = signal<TaskItem[]>([]);
   isLoading = signal(false);
   errorMessage = signal('');
-
+  editingId: number | null = null;
   title = '';
   description = '';
   status = 'To Do';
@@ -46,24 +51,80 @@ export class Tasks implements OnInit {
     });
   }
 
-  onCreate(): void {
+   onSubmit(): void {
+    if (this.editingId === null) {
+      this.createTask();
+    } else {
+      this.saveEdit();
+    }
+  }
+  private createTask(): void {
     const payload: CreateTaskRequest = {
       title: this.title,
       description: this.description,
       status: this.status,
     };
-
     this.taskService.createTask(payload).subscribe({
       next: () => {
-        this.title = '';
-        this.description = '';
-        this.status = 'To Do';
+        this.resetForm();
         this.loadTasks();
       },
       error: () => {
         this.errorMessage.set('Could not create the task.');
       },
     });
+  }
+  private saveEdit(): void {
+    if (this.editingId === null) {
+      return;
+    }
+    const payload: UpdateTaskRequest = {
+      title: this.title,
+      description: this.description,
+      status: this.status,
+    };
+    this.taskService.updateTask(this.editingId, payload).subscribe({
+      next: () => {
+        this.resetForm();
+        this.loadTasks();
+      },
+      error: () => {
+        this.errorMessage.set('Could not update the task.');
+      },
+    });
+  }
+  startEdit(task: TaskItem): void {
+    this.editingId = task.id;
+    this.title = task.title;
+    this.description = task.description;
+    this.status = task.status;
+    this.errorMessage.set('');
+  }
+  cancelEdit(): void {
+    this.resetForm();
+  }
+  onDelete(task: TaskItem): void {
+    const ok = confirm(`Delete task "${task.title}"?`);
+    if (!ok) {
+      return;
+    }
+    this.taskService.deleteTask(task.id).subscribe({
+      next: () => {
+        if (this.editingId === task.id) {
+          this.resetForm();
+        }
+        this.loadTasks();
+      },
+      error: () => {
+        this.errorMessage.set('Could not delete the task.');
+      },
+    });
+  }
+  private resetForm(): void {
+    this.editingId = null;
+    this.title = '';
+    this.description = '';
+    this.status = 'To Do';
   }
 
   logout(): void {
