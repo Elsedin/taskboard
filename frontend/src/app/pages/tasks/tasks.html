@@ -1,4 +1,56 @@
 <section class="tasks">
-  <h1>Moji taskovi</h1>
-  <p>Ulogovan si. Lista taskova dolazi u sljedećem koraku.</p>
+  <header class="tasks-header">
+    <h1>My tasks</h1>
+    <button type="button" (click)="logout()">Log out</button>
+  </header>
+
+  @if (isLoading()) {
+    <p>Loading…</p>
+  }
+
+  @if (errorMessage()) {
+    <p class="error">{{ errorMessage() }}</p>
+  }
+
+  <form class="create-form" (ngSubmit)="onCreate()">
+    <h2>New task</h2>
+
+    <label>
+      Title
+      <input name="title" [(ngModel)]="title" required />
+    </label>
+
+    <label>
+      Description
+      <input name="description" [(ngModel)]="description" />
+    </label>
+
+    <label>
+      Status
+      <select name="status" [(ngModel)]="status">
+        <option value="To Do">To Do</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Done">Done</option>
+      </select>
+    </label>
+
+    <button type="submit">Add</button>
+  </form>
+
+  @if (tasks().length === 0 && !isLoading()) {
+    <p>No tasks yet.</p>
+  }
+
+  <ul>
+    @for (task of tasks(); track task.id) {
+      <li>
+        <strong>{{ task.title }}</strong>
+        <span> — {{ task.status }}</span>
+        @if (task.description) {
+          <p>{{ task.description }}</p>
+        }
+        <small>{{ task.createdAt | date: 'short' }}</small>
+      </li>
+    }
+  </ul>
 </section>
