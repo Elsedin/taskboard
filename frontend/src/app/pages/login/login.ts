@@ -25,8 +25,7 @@ export class Login {
     this.auth.login({email:this.email, password:this.password}).subscribe({
       next: () => {
         this.isLoading.set(false);
-        console.log('Login OK, token:', this.auth.getToken());
-        alert('Login uspješan! Token je u localStorage.');
+        this.router.navigate(['/tasks']);
       },
 
       error: () => {
