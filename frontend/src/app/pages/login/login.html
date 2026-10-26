@@ -1,6 +1,6 @@
 <section class="login">
   <h1>TaskBoard</h1>
-  <p>Prijavi se na nalog</p>
+  <p>Sign in to your account</p>
 
   <form (ngSubmit)="onSubmit()">
     <label>
@@ -9,7 +9,7 @@
     </label>
 
     <label>
-      Lozinka
+      Password
       <input type="password" name="password" [(ngModel)]="password" required />
     </label>
 
@@ -18,7 +18,11 @@
     }
 
     <button type="submit" [disabled]="isLoading()">
-      {{ isLoading() ? 'Prijava…' : 'Prijavi se' }}
+      {{ isLoading() ? 'Signing in…' : 'Sign in' }}
     </button>
   </form>
+    <p>
+      No account?
+    <a routerLink="/register">Register</a>
+  </p>
 </section>

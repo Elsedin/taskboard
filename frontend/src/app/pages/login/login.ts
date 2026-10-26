@@ -1,11 +1,11 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
@@ -31,7 +31,7 @@ export class Login {
       error: () => {
         this.isLoading.set(false);
         this.errorMessage.set(
-          'Prijava nije uspjela. Provjeri email/lozinku i da li API radi.',
+          'Login failed. Check your email/password and that the API is running.',
         );
       },
     });
