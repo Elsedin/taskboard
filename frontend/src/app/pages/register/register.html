@@ -1,0 +1,29 @@
+<section class="register">
+  <h1>TaskBoard</h1>
+  <p>Create an account</p>
+
+  <form (ngSubmit)="onSubmit()">
+    <label>
+      Email
+      <input type="email" name="email" [(ngModel)]="email" required />
+    </label>
+
+    <label>
+      Password
+      <input type="password" name="password" [(ngModel)]="password" required minlength="6" />
+    </label>
+
+    @if (errorMessage()) {
+      <p class="error">{{ errorMessage() }}</p>
+    }
+
+    <button type="submit" [disabled]="isLoading()">
+      {{ isLoading() ? 'Creating…' : 'Register' }}
+    </button>
+  </form>
+
+  <p>
+    Already have an account?
+    <a routerLink="/login">Log in</a>
+  </p>
+</section>

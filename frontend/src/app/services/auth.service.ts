@@ -14,6 +14,16 @@ export interface LoginResponse {
     userId: number;
 }
 
+export interface RegisterRequest {
+  email: string;
+  password: string;
+}
+
+export interface RegisterResponse {
+  id: number;
+  email: string;
+}
+
 @Injectable({
     providedIn: 'root',
 })
@@ -29,6 +39,13 @@ export class AuthService {
                     localStorage.setItem(this.tokenKey, res.token);
                 }),
             );
+    }
+
+    register(payload: RegisterRequest): Observable<RegisterResponse> {
+        return this.http.post<RegisterResponse>(
+            `${environment.apiUrl}/api/auth/register`,
+            payload,
+        );
     }
 
     getToken(): string | null {
