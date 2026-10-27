@@ -45,12 +45,27 @@
     </div>
   </form>
 
+  <div class="filters" role="group" aria-label="Filter by status">
+    @for (option of filterOptions; track option) {
+      <button
+        type="button"
+        class="filter-btn"
+        [class.active]="statusFilter() === option"
+        (click)="setStatusFilter(option)"
+      >
+        {{ option }}
+      </button>
+    }
+  </div>
+
   @if (tasks().length === 0 && !isLoading()) {
     <p>No tasks yet.</p>
+  } @else if (filteredTasks().length === 0 && !isLoading()) {
+    <p>No tasks with this status.</p>
   }
 
   <ul>
-    @for (task of tasks(); track task.id) {
+    @for (task of filteredTasks(); track task.id) {
       <li>
         <strong>{{ task.title }}</strong>
         <span> — {{ task.status }}</span>
@@ -58,7 +73,7 @@
           <p>{{ task.description }}</p>
         }
         <small>{{ task.createdAt | date: 'short' }}</small>
-                <div class="row-actions">
+        <div class="row-actions">
           <button type="button" (click)="startEdit(task)">Edit</button>
           <button type="button" (click)="onDelete(task)">Delete</button>
         </div>
