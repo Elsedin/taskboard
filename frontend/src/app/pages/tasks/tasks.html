@@ -12,8 +12,8 @@
     <p class="error">{{ errorMessage() }}</p>
   }
 
-    <form class="create-form" (ngSubmit)="onSubmit()">
-        <h2>{{ editingId === null ? 'New task' : 'Edit task' }}</h2>
+  <form class="create-form" (ngSubmit)="onSubmit()">
+    <h2>{{ editingId === null ? 'New task' : 'Edit task' }}</h2>
 
     <label>
       Title
@@ -34,7 +34,7 @@
       </select>
     </label>
 
-        <div class="form-actions">
+    <div class="form-actions">
       <button type="submit">
         {{ editingId === null ? 'Add' : 'Save' }}
       </button>
@@ -45,39 +45,32 @@
     </div>
   </form>
 
-  <div class="filters" role="group" aria-label="Filter by status">
-    @for (option of filterOptions; track option) {
-      <button
-        type="button"
-        class="filter-btn"
-        [class.active]="statusFilter() === option"
-        (click)="setStatusFilter(option)"
-      >
-        {{ option }}
-      </button>
-    }
-  </div>
-
   @if (tasks().length === 0 && !isLoading()) {
     <p>No tasks yet.</p>
-  } @else if (filteredTasks().length === 0 && !isLoading()) {
-    <p>No tasks with this status.</p>
+  } @else if (!isLoading()) {
+    <div class="board">
+      @for (column of boardColumns(); track column.status) {
+        <section class="column">
+          <h3>{{ column.status }}</h3>
+          <ul>
+            @for (task of column.tasks; track task.id) {
+              <li>
+                <strong>{{ task.title }}</strong>
+                @if (task.description) {
+                  <p>{{ task.description }}</p>
+                }
+                <small>{{ task.createdAt | date: 'short' }}</small>
+                <div class="row-actions">
+                  <button type="button" (click)="startEdit(task)">Edit</button>
+                  <button type="button" (click)="onDelete(task)">Delete</button>
+                </div>
+              </li>
+            } @empty {
+              <li class="empty-column">No tasks</li>
+            }
+          </ul>
+        </section>
+      }
+    </div>
   }
-
-  <ul>
-    @for (task of filteredTasks(); track task.id) {
-      <li>
-        <strong>{{ task.title }}</strong>
-        <span> — {{ task.status }}</span>
-        @if (task.description) {
-          <p>{{ task.description }}</p>
-        }
-        <small>{{ task.createdAt | date: 'short' }}</small>
-        <div class="row-actions">
-          <button type="button" (click)="startEdit(task)">Edit</button>
-          <button type="button" (click)="onDelete(task)">Delete</button>
-        </div>
-      </li>
-    }
-  </ul>
 </section>
