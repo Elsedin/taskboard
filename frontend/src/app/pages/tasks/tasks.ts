@@ -10,8 +10,6 @@ import {
   UpdateTaskRequest,
 } from '../../services/task.service';
 
-export type StatusFilter = 'All' | 'To Do' | 'In Progress' | 'Done';
-
 @Component({
   selector: 'app-tasks',
   imports: [FormsModule, DatePipe],
@@ -23,10 +21,7 @@ export class Tasks implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
-  readonly filterOptions: StatusFilter[] = ['All', 'To Do', 'In Progress', 'Done'];
-
   tasks = signal<TaskItem[]>([]);
-  statusFilter = signal<StatusFilter>('All');
   isLoading = signal(false);
   errorMessage = signal('');
   editingId: number | null = null;
@@ -34,21 +29,20 @@ export class Tasks implements OnInit {
   description = '';
   status = 'To Do';
 
-  filteredTasks = computed(() => {
-    const filter = this.statusFilter();
+  boardColumns = computed(() => {
     const all = this.tasks();
-    if (filter === 'All') {
-      return all;
-    }
-    return all.filter((task) => task.status === filter);
+    return [
+      { status: 'To Do', tasks: all.filter((task) => task.status === 'To Do') },
+      {
+        status: 'In Progress',
+        tasks: all.filter((task) => task.status === 'In Progress'),
+      },
+      { status: 'Done', tasks: all.filter((task) => task.status === 'Done') },
+    ];
   });
 
   ngOnInit(): void {
     this.loadTasks();
-  }
-
-  setStatusFilter(filter: StatusFilter): void {
-    this.statusFilter.set(filter);
   }
 
   loadTasks(): void {
@@ -69,13 +63,14 @@ export class Tasks implements OnInit {
     });
   }
 
-   onSubmit(): void {
+  onSubmit(): void {
     if (this.editingId === null) {
       this.createTask();
     } else {
       this.saveEdit();
     }
   }
+
   private createTask(): void {
     const payload: CreateTaskRequest = {
       title: this.title,
@@ -92,6 +87,7 @@ export class Tasks implements OnInit {
       },
     });
   }
+
   private saveEdit(): void {
     if (this.editingId === null) {
       return;
@@ -111,6 +107,7 @@ export class Tasks implements OnInit {
       },
     });
   }
+
   startEdit(task: TaskItem): void {
     this.editingId = task.id;
     this.title = task.title;
@@ -118,9 +115,11 @@ export class Tasks implements OnInit {
     this.status = task.status;
     this.errorMessage.set('');
   }
+
   cancelEdit(): void {
     this.resetForm();
   }
+
   onDelete(task: TaskItem): void {
     const ok = confirm(`Delete task "${task.title}"?`);
     if (!ok) {
@@ -138,6 +137,7 @@ export class Tasks implements OnInit {
       },
     });
   }
+
   private resetForm(): void {
     this.editingId = null;
     this.title = '';
