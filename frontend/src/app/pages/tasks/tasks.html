@@ -1,11 +1,14 @@
 <section class="tasks">
   <header class="tasks-header">
-    <h1>My tasks</h1>
-    <button type="button" (click)="logout()">Log out</button>
+    <div class="tasks-heading">
+      <p class="brand">TaskBoard</p>
+      <h1>My tasks</h1>
+    </div>
+    <button type="button" class="btn-ghost" (click)="logout()">Log out</button>
   </header>
 
   @if (isLoading()) {
-    <p>Loading…</p>
+    <p class="status-line">Loading…</p>
   }
 
   @if (errorMessage()) {
@@ -15,54 +18,61 @@
   <form class="create-form" (ngSubmit)="onSubmit()">
     <h2>{{ editingId === null ? 'New task' : 'Edit task' }}</h2>
 
-    <label>
-      Title
-      <input name="title" [(ngModel)]="title" required />
-    </label>
+    <div class="form-grid">
+      <label>
+        Title
+        <input name="title" [(ngModel)]="title" required />
+      </label>
 
-    <label>
-      Description
-      <input name="description" [(ngModel)]="description" />
-    </label>
+      <label>
+        Description
+        <input name="description" [(ngModel)]="description" />
+      </label>
 
-    <label>
-      Status
-      <select name="status" [(ngModel)]="status">
-        <option value="To Do">To Do</option>
-        <option value="In Progress">In Progress</option>
-        <option value="Done">Done</option>
-      </select>
-    </label>
+      <label>
+        Status
+        <select name="status" [(ngModel)]="status">
+          <option value="To Do">To Do</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Done">Done</option>
+        </select>
+      </label>
+    </div>
 
     <div class="form-actions">
-      <button type="submit">
+      <button type="submit" class="btn-primary">
         {{ editingId === null ? 'Add' : 'Save' }}
       </button>
 
       @if (editingId !== null) {
-        <button type="button" (click)="cancelEdit()">Cancel</button>
+        <button type="button" class="btn-ghost" (click)="cancelEdit()">Cancel</button>
       }
     </div>
   </form>
 
   @if (tasks().length === 0 && !isLoading()) {
-    <p>No tasks yet.</p>
+    <p class="status-line">No tasks yet. Add one above to fill the board.</p>
   } @else if (!isLoading()) {
     <div class="board">
       @for (column of boardColumns(); track column.status) {
         <section class="column">
-          <h3>{{ column.status }}</h3>
+          <h3>
+            {{ column.status }}
+            <span class="count">{{ column.tasks.length }}</span>
+          </h3>
           <ul>
             @for (task of column.tasks; track task.id) {
-              <li>
+              <li class="task-card">
                 <strong>{{ task.title }}</strong>
                 @if (task.description) {
                   <p>{{ task.description }}</p>
                 }
                 <small>{{ task.createdAt | date: 'short' }}</small>
                 <div class="row-actions">
-                  <button type="button" (click)="startEdit(task)">Edit</button>
-                  <button type="button" (click)="onDelete(task)">Delete</button>
+                  <button type="button" class="btn-small" (click)="startEdit(task)">Edit</button>
+                  <button type="button" class="btn-small danger" (click)="onDelete(task)">
+                    Delete
+                  </button>
                 </div>
               </li>
             } @empty {
