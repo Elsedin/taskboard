@@ -1,29 +1,39 @@
-<section class="register">
-  <h1>TaskBoard</h1>
-  <p>Create an account</p>
+<section class="auth-page">
+  <div class="auth-panel">
+    <p class="brand">TaskBoard</p>
+    <h1>Create account</h1>
+    <p class="lede">A few details and you can start organizing tasks.</p>
 
-  <form (ngSubmit)="onSubmit()">
-    <label>
-      Email
-      <input type="email" name="email" [(ngModel)]="email" required />
-    </label>
+    <form (ngSubmit)="onSubmit()">
+      <label>
+        Email
+        <input type="email" name="email" [(ngModel)]="email" required autocomplete="email" />
+      </label>
 
-    <label>
-      Password
-      <input type="password" name="password" [(ngModel)]="password" required minlength="6" />
-    </label>
+      <label>
+        Password
+        <input
+          type="password"
+          name="password"
+          [(ngModel)]="password"
+          required
+          minlength="6"
+          autocomplete="new-password"
+        />
+      </label>
 
-    @if (errorMessage()) {
-      <p class="error">{{ errorMessage() }}</p>
-    }
+      @if (errorMessage()) {
+        <p class="error">{{ errorMessage() }}</p>
+      }
 
-    <button type="submit" [disabled]="isLoading()">
-      {{ isLoading() ? 'Creating…' : 'Register' }}
-    </button>
-  </form>
+      <button type="submit" class="btn-primary" [disabled]="isLoading()">
+        {{ isLoading() ? 'Creating…' : 'Register' }}
+      </button>
+    </form>
 
-  <p>
-    Already have an account?
-    <a routerLink="/login">Log in</a>
-  </p>
+    <p class="auth-footer">
+      Already have an account?
+      <a routerLink="/login">Log in</a>
+    </p>
+  </div>
 </section>
