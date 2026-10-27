@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
@@ -9,6 +9,8 @@ import {
   TaskService,
   UpdateTaskRequest,
 } from '../../services/task.service';
+
+export type StatusFilter = 'All' | 'To Do' | 'In Progress' | 'Done';
 
 @Component({
   selector: 'app-tasks',
@@ -21,7 +23,10 @@ export class Tasks implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
+  readonly filterOptions: StatusFilter[] = ['All', 'To Do', 'In Progress', 'Done'];
+
   tasks = signal<TaskItem[]>([]);
+  statusFilter = signal<StatusFilter>('All');
   isLoading = signal(false);
   errorMessage = signal('');
   editingId: number | null = null;
@@ -29,8 +34,21 @@ export class Tasks implements OnInit {
   description = '';
   status = 'To Do';
 
+  filteredTasks = computed(() => {
+    const filter = this.statusFilter();
+    const all = this.tasks();
+    if (filter === 'All') {
+      return all;
+    }
+    return all.filter((task) => task.status === filter);
+  });
+
   ngOnInit(): void {
     this.loadTasks();
+  }
+
+  setStatusFilter(filter: StatusFilter): void {
+    this.statusFilter.set(filter);
   }
 
   loadTasks(): void {

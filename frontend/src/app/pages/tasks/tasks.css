@@ -53,3 +53,23 @@ li {
   gap: 0.5rem;
   margin-top: 0.5rem;
 }
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.filter-btn {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+}
+
+.filter-btn.active {
+  border-color: #333;
+  background: #333;
+  color: #fff;
+}
