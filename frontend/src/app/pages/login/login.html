@@ -4,6 +4,10 @@
     <h1>Sign in</h1>
     <p class="lede">Welcome back. Pick up where you left off.</p>
 
+    @if (successMessage()) {
+      <p class="success">{{ successMessage() }}</p>
+    }
+
     <form (ngSubmit)="onSubmit()">
       <label>
         Email

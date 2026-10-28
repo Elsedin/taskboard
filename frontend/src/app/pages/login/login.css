@@ -94,6 +94,16 @@ input:focus {
   font-size: 0.9rem;
 }
 
+.success {
+  margin: 0 0 1rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 12%, #fff);
+  color: var(--accent-hover);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
 .auth-footer {
   margin: 1.25rem 0 0;
   text-align: center;

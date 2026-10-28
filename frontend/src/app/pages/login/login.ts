@@ -16,13 +16,25 @@ export class Login {
   email = '';
   password = '';
   errorMessage = signal('');
+  successMessage = signal('');
   isLoading = signal(false);
+
+  constructor() {
+    const state = this.router.getCurrentNavigation()?.extras.state as
+      | { registered?: boolean }
+      | undefined;
+
+    if (state?.registered) {
+      this.successMessage.set('Account created. Please sign in.');
+    }
+  }
 
   onSubmit(): void {
     this.errorMessage.set('');
+    this.successMessage.set('');
     this.isLoading.set(true);
 
-    this.auth.login({email:this.email, password:this.password}).subscribe({
+    this.auth.login({ email: this.email, password: this.password }).subscribe({
       next: () => {
         this.isLoading.set(false);
         this.router.navigate(['/tasks']);
