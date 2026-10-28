@@ -88,6 +88,13 @@ input:focus {
   cursor: not-allowed;
 }
 
+.field-hint {
+  margin: -0.55rem 0 1rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
 .error {
   margin: 0 0 0.85rem;
   color: var(--danger);
