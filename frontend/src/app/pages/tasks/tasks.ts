@@ -24,6 +24,7 @@ export class Tasks implements OnInit {
   tasks = signal<TaskItem[]>([]);
   isLoading = signal(false);
   errorMessage = signal('');
+  userEmail = this.auth.getEmail();
   editingId: number | null = null;
   title = '';
   description = '';

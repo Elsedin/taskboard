@@ -4,7 +4,12 @@
       <p class="brand">TaskBoard</p>
       <h1>My tasks</h1>
     </div>
-    <button type="button" class="btn-ghost" (click)="logout()">Log out</button>
+    <div class="header-actions">
+      @if (userEmail) {
+        <span class="user-email">{{ userEmail }}</span>
+      }
+      <button type="button" class="btn-ghost" (click)="logout()">Log out</button>
+    </div>
   </header>
 
   @if (isLoading()) {
