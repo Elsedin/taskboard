@@ -25,7 +25,9 @@ export class Register {
     this.auth.register({ email: this.email, password: this.password }).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.router.navigate(['/login']);
+        this.router.navigate(['/login'], {
+          state: { registered: true },
+        });
       },
       error: (err) => {
         this.isLoading.set(false);
